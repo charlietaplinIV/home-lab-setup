@@ -48,4 +48,8 @@ This lab simulates a small enterprise IT environment using virtualization tools 
 - Add File Server role and configure NTFS permissions
 - Simulate password policies and logon scripts
 
+- ## 📘 Detailed Walkthrough
+
+For a complete guide with screenshots and expanded explanations, check out the [Step-by-Step Walkthrough](walkthrough.md).
+
 - ---
