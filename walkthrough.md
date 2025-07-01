@@ -23,46 +23,80 @@ This guide walks you through building a Windows Server 2022 domain environment f
 ### 🖥️ Create Your Virtual Machines
 
 #### VM 1: Domain Controller
-- **Name**: DC1 <--- Name this to your own cusmtom domain controller name!
+On Virtural Box Orcal Manager Start the program and select New to start the creation of your first virtual machine.
+
+- **Name**: DC01 <--- Name this for your own cusmtom domain controller name!
 - **OS (ISO Image)**: Windows Server 2022 <--- Locate your Windows Server 2022 ISO and select it.
 **Please Be Sure To Select Desktop Experience In The Edition Tab If You Want A Desktop Enviroment!**
 
-![Screenshot 2025-06-30 002436](https://github.com/user-attachments/assets/3c04b0a1-a05d-4496-944d-243446c960b3)
- 
-- **Username & Password**: charlie4 <-- create your own username and password to login to your DC.
-- **Hostname**: DC1 <-- Should be the same as the name you typed in on the previeous page.
-- **Domain Name**: charlie4.visuals.org <-- contains the custom domain name you will be using.
+![Screenshot 2025-06-30 200324](https://github.com/user-attachments/assets/97748b96-5475-439b-93fe-a341a19f6b84)
 
-![Screenshot 2025-06-29 064019](https://github.com/user-attachments/assets/56ef8338-06fe-4a87-86a8-76d1cf2d37f6)
+- **Username & Password**: Administrator <-- create your own username and password to login to your DC.
+- **Hostname**: DC01 <-- Should be the same as the name you typed in on the previeous page.
 
+![Screenshot 2025-06-30 200501](https://github.com/user-attachments/assets/22555490-7682-4f9a-bbbe-00ad4a5b0bca)
 
-- **RAM**: 2–6 GB <-- recommend 2GB of ram to not use up host computer resources.
+- **RAM (Base Memory)**: 2–6 GB <-- recommend 2GB of ram to not use up host computer resources.
 - **Processors**: 2
 - **Storage**: 40–60 GB (Dynamically allocated)
-
-After configuring and all settings close and power off your Windows Server VM for now so we can setup the network!
-
 - **Network Adapter**: Internal Network (create a new one called `LabNet` or similar)
-- With your Windows Server Selected hit the Settings Icon and Navagiate to Network. Enable your Network Adapter 1 and change the `Attached to` section to Internal Network and name it to your desired Network Name.
 
-![Screenshot 2025-06-30 001227](https://github.com/user-attachments/assets/fcf6aa9a-927a-4cd5-908b-183fa5062edd)
-
-Now run the virtural machine and let it install your Windows Server!
-After Windows Server 2022 install is complete shut down the virtural machine and head back to your Settings and navagiate to `Storage`. In the storage settings click on your ISO file you used to install windows and in the `Attributes` section click the CD icon and then click Remove Disk From Virtual Drive. This will help prevent the VM from running the windows installation agian.
-
-![Screenshot 2025-06-30 005201](https://github.com/user-attachments/assets/db35e5e6-17f0-47af-afe3-bc96ccd65e13)
-
+After all settings are done hit finish and let the VM run the windows setup! 
 
 #### VM 2: Client Machine
-- **Name**: Win10-PC
-- **OS**: Windows 10 Pro
+On Virtural Box Orcal Manager Start the program and select New to start the creation of your Windows 10 Machine.
+
+- **Name**: Win10-PC <--- Name of your Windows 10 PC
+- **OS**: Windows 10 Pro <--- Locate your Windows 10 ISO and select it.
 - **RAM**: 2–4 GB
 - **Processors**: 1–2
 - **Storage**: 30–50 GB
 - **Network Adapter**: Internal Network (`LabNet`)
+- **Troubleshooting Fix** If you are getting "Windows cannot read the <ProductKey> setting from unattend answer file." Follow these steps to fix the error!
+- Step 1 - Shutdown your Windows 10 VM
+- Step 2 - Open FIle Expolere and head to C:/Users/yourprofile/Virtual VMs/Windows 10 VM Machine Name
+- Step 3 - Delete any Unattended files in the directory.
+- Step 4 - Close File Explorer and start your Virtural Machine back up.
+- Step 5 - Continue Windows 10 Installation! <-- Make sure to choose Windows 10 Pro as your OS System.
+
+---
 
 ## 🔐 Step 2: Install & Configure Windows Server 2022
-...
+
+### 🖥️ Post-Installation Configuration
+1. Open **Server Manager**.
+2. Set a static IP address via:
+   - **Network and Sharing Center** → Adapter settings → Ethernet 2 → IPv4 properties.
+   - Example:  
+     - IP: `192.168.10.10`  
+     - Subnet: `255.255.255.0`  
+     - Default Gateway: leave blank or `192.168.10.1`  
+     - Preferred DNS: `192.168.10.10` (self-reference) <-- You can also use 127.0.0.1 as a loopback address!
+
+![Screenshot 2025-07-01 052442](https://github.com/user-attachments/assets/7a7b9095-d69e-4b78-88cd-959bd109004f)
+
+---
+
+### ⚙️ Promote to Domain Controller
+1. In Server Manager,  go to Manage and click **Add Roles and Features**.
+3. Click Role Based or Featured Base Installation in the `Installation Type` Tab.
+4. In `Server Selecton` choose the domain controller (DC01) in the sever pool.
+5. Select **Active Directory Domain Services (AD DS)** in the `Server Roles` Tab.
+6. Click next on the rest of the tabs until you get to Confirmation then select Install.
+7. After installation, click the yellow flag in Server Manager → **Promote this server to a domain controller**.
+8. Choose:
+   - **Add a new forest**
+   - Domain name: `mydomainname.local`
+9. Set a DSRM (Directory Services Restore Mode) password.
+10. Accept the defaults for DNS and NetBIOS.
+11. Review, install, and reboot.
+
+---
+
+### ✅ Confirmation Steps
+- Open **Active Directory Users and Computers** and verify your domain.
+- Test local administrator login with domain name (e.g., `charliedomain\Administrator`).
+- Check DNS Manager to verify zones were created.
 
 ## 🧠 Step 3: Configure Active Directory, DNS, DHCP
 ...
