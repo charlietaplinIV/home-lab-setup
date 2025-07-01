@@ -66,14 +66,15 @@ On Virtural Box Orcal Manager Start the program and select New to start the crea
 ### 🖥️ Post-Installation Configuration
 1. Open **Server Manager**.
 2. Set a static IP address via:
-   - **Network and Sharing Center** → Adapter settings → Ethernet 2 → IPv4 properties.
+   - **Network and Sharing Center** → Adapter settings → Ethernet → IPv4 properties.
    - Example:  
      - IP: `192.168.10.10`  
      - Subnet: `255.255.255.0`  
      - Default Gateway: leave blank or `192.168.10.1`  
-     - Preferred DNS: `192.168.10.10` (self-reference) <-- You can also use 127.0.0.1 as a loopback address!
+     - Preferred DNS: `192.168.10.10` (self-reference)
 
-![Screenshot 2025-07-01 052442](https://github.com/user-attachments/assets/7a7b9095-d69e-4b78-88cd-959bd109004f)
+![Screenshot 2025-07-01 080917](https://github.com/user-attachments/assets/2d378377-72bb-4dff-a650-0825d6cb4052)
+
 
 ---
 
@@ -100,6 +101,51 @@ On Virtural Box Orcal Manager Start the program and select New to start the crea
 
 ## 🧠 Step 3: Configure Active Directory, DNS, DHCP
 ...
+
+### 📡 Install and Verify DNS
+1. DNS is automatically installed when promoting your server to a Domain Controller.
+2. Open **DNS Manager** to confirm that your forward and reverse lookup zones were created (e.g., `charliedomain.local`).
+3. Test name resolution:
+   - From PowerShell: `nslookup charliedomain.local`
+
+---
+
+### 🌐 Install DHCP Server Role
+1. In **Server Manager**, go to **Add Roles and Features**.
+2. Select **DHCP Server** and proceed with installation.
+3. Once installed, click the yellow flag in Server Manager and complete **DHCP post-install configuration**.
+
+---
+
+### 🧭 Configure a DHCP Scope
+1. Open **DHCP Manager** from Server Manager or Tools menu.
+2. Right-click **IPv4** → **New Scope**.
+3. Configure:
+   - **Scope Name**: `LabNetwork`
+   - **IP Range**: `192.168.10.100` to `192.168.10.200`
+   - **Subnet Mask**: `255.255.255.0`
+   - **Default Gateway**: Leave blank or add if configured
+   - **DNS Server**: `192.168.10.10` (your DC's IP)
+4. Activate the scope.
+
+---
+
+### 🪄 Set Up Group Policy Management
+1. Add the **Group Policy Management** feature via Roles and Features (if not already present).
+2. Open **Group Policy Management Console (GPMC)**.
+3. Right-click your domain or an OU → **Create a GPO** (e.g., `DesktopLockdown`).
+4. Edit the GPO to configure policies like:
+   - Disable Control Panel
+   - Set a desktop background
+   - Enforce password policy
+5. Link your GPO to the appropriate OU.
+
+---
+
+### ✅ Confirm Services
+- Run `ipconfig /all` on a domain-joined client to ensure it received a DHCP lease.
+- Use `gpresult /r` or `rsop.msc` to confirm applied policies.
+- Ensure DNS name resolution and domain trust are working properly.
 
 ## 👥 Step 4: Create OUs, Users, Groups
 ...
