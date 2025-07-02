@@ -96,7 +96,7 @@ On Virtural Box Orcal Manager Start the program and select New to start the crea
 
 ### ✅ Confirmation Steps
 - Open **Active Directory Users and Computers** and verify your domain.
-- Test local administrator login with domain name (e.g., `charliedomain\Administrator`).
+- Test local administrator login with domain name (e.g., `mydomainname\Administrator`).
 - Check DNS Manager to verify zones were created.
 
 ## 🧠 Step 3: Configure Active Directory, DNS, DHCP
@@ -104,9 +104,9 @@ On Virtural Box Orcal Manager Start the program and select New to start the crea
 
 ### 📡 Install and Verify DNS
 1. DNS is automatically installed when promoting your server to a Domain Controller.
-2. Open **DNS Manager** to confirm that your forward and reverse lookup zones were created (e.g., `charliedomain.local`).
+2. Open **DNS Manager** to confirm that your forward and reverse lookup zones were created (e.g., `mydomainname.local`).
 3. Test name resolution:
-   - From PowerShell: `nslookup charliedomain.local`
+   - From PowerShell: `nslookup mydomainname.local`
 
 ---
 
@@ -127,6 +127,8 @@ On Virtural Box Orcal Manager Start the program and select New to start the crea
    - **Default Gateway**: Leave blank or add if configured
    - **DNS Server**: `192.168.10.10` (your DC's IP)
 4. Activate the scope.
+  
+  ![Screenshot 2025-07-02 122416](https://github.com/user-attachments/assets/9156abcf-d733-4a7f-8d7c-c61c61da916f)
 
 ---
 
@@ -149,15 +151,124 @@ On Virtural Box Orcal Manager Start the program and select New to start the crea
 
 ## 👥 Step 4: Create OUs, Users, Groups
 ...
+A properly structured domain lets you manage users and resources more efficiently. In this step, we’ll organize the environment using Organizational Units (OUs), create user accounts, and apply security groups for future policy control.
+
+---
+
+### 🗂️ 1. Create Organizational Units (OUs)
+
+1. Open **Active Directory Users and Computers (ADUC)**.
+2. Right-click your domain name (`mydomainname.local`) → **New → Organizational Unit**.
+
+   ![Screenshot 2025-07-02 123933](https://github.com/user-attachments/assets/5e4c8676-8cc7-4f1a-959d-6d0eb4b88db7)
+
+4. Create the following OUs:
+   - `IT`
+   - `Sales`
+   - `HR`
+   - `Workstations` *(optional, for placing client computers)*
+
+> 💡 *Tip: OUs are containers that help apply Group Policies and organize accounts by department or function.*
+
+---
+
+### 👤 2. Add User Accounts
+
+For each department, create sample user accounts:
+
+1. Right-click the appropriate OU → **New → User**
+2. Fill in:
+   - First name: `Chris` | Last name: `Johnson` (in `IT`)
+   - Logon name: `c.johnson`
+3. Set a secure password and choose whether the user must reset it at next login.
+
+Repeat for other users, for example:
+
+| Name            | OU    | Username        |
+|------------------|--------|------------------|
+| Chris Johnson    | IT     | `c.johnson`      |
+| Dana Fields      | HR     | `d.fields`       |
+| Alex Rivas       | Sales  | `a.rivas`        |
+
+---
+
+### 🧑‍🤝‍🧑 3. Create Security Groups
+
+1. Right-click an OU (e.g., `Sales`) → **New → Group**
+2. Group settings:
+   - Name: `Sales_Share_Access`
+   - Group type: **Security**
+   - Scope: **Global**
+3. Add members by right-clicking the group → **Properties → Members → Add**
+
+Use groups for:
+- Access control (e.g., printers, fileshares)
+- GPO filtering
+- Delegation of permissions
+
+---
+
+✅ **Checkpoint:**
+- OUs are created and nested neatly
+- Users appear in their correct departments
+- At least one group exists with assigned members
 
 ## 💻 Step 5: Join Windows 10 Client to Domain
 ...
 
-## 🧪 Step 6: Test Everything
-...
+With DNS and network settings correctly configured, it's time to connect the client machine to the domain controller.
 
-## 🖼️ Screenshots
-*Add images here as you go*
+---
+
+### 🖥️ 1. Finalize Client Network Settings
+Ensure your Windows 10 VM is using the **same Internal Network** as the domain controller (`LabNet`, for example).
+
+In the client’s IPv4 adapter settings:
+
+- **IP Address**: `192.168.10.101` (or auto-assigned from DHCP)
+- **Subnet Mask**: `255.255.255.0`
+- **Default Gateway**: *(Optional, can leave blank)*
+- **Preferred DNS Server**: `192.168.10.10` (your DC’s IP)
+
+---
+
+### 🔍 2. Test Connectivity to the Domain
+
+Run these from Command Prompt:
+
+``bash
+ping 192.168.10.10
+nslookup mydomainname.local
+- If both succeed, your DNS and network path are good to go.
+
+🔐 3. Join the Domain
+- Open System Properties:
+- Press Windows + R → type sysdm.cpl → press Enter
+- Under the Computer Name tab, click Change
+- Select Domain, then enter:
+charliedomain.local
+- 
+- When prompted, enter:
+- Username: Administrator
+- Password: (the one you set on your DC)
+If successful, you’ll see:
+✅ “Welcome to the mydomainname.local domain”
+- Click OK and restart the computer.
+- 
+👤 4. Log In with a Domain User
+After reboot:
+- At the login screen, select Other User
+- Enter credentials like:
+charliedomain\c.johnson
+- If successful, you’re now running under a domain profile!
+
+
+🎉 Lab Complete! You’ve now built, configured, and verified a functioning Windows Server domain environment—all locally, using VirtualBox. This serves as proof of your skills in:
+- Virtualization
+- DNS, DHCP, and AD configuration
+- Group Policy
+- Domain architecture and client management
+
 
 ---
 
