@@ -40,9 +40,9 @@ This lab simulates a small enterprise IT environment using virtualization tools 
 - Applying and testing Group Policy Objects
 
 ## 🧠 What I Learned
-- [Example: How to resolve domain login failures]
-- [Example: Importance of sequencing network role setups]
-- [Example: Efficient documentation for IT procedures]
+- How to resolve domain login failures
+- Importance of sequencing network role setups
+- Efficient documentation for IT procedures
 
 ## 🌱 Future Plans
 - Add File Server role and configure NTFS permissions
